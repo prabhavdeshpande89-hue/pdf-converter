@@ -1,0 +1,18 @@
+.button-container {
+  margin-top: 25px;
+}
+
+.convert-btn {
+  padding: 12px 28px;
+  font-size: 16px;
+  background: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.convert-btn:hover {
+  background: #4f46e5;
+}

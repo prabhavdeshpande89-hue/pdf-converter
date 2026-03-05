@@ -1,0 +1,13 @@
+.file-preview {
+  text-align: center;
+}
+
+.file-preview p {
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.file-preview span {
+  font-size: 13px;
+  color: #6b7280;
+}
