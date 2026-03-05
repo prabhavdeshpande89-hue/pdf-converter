@@ -1,0 +1,15 @@
+FROM node:18
+
+# install libreoffice
+RUN apt-get update && apt-get install -y libreoffice
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+EXPOSE 5000
+
+CMD ["node", "server.js"]

@@ -7,7 +7,6 @@ const libre = require("libreoffice-convert");
 const app = express();
 app.use(cors());
 
-// create folders if they don't exist
 if (!fs.existsSync("uploads")) {
   fs.mkdirSync("uploads");
 }
@@ -18,13 +17,15 @@ if (!fs.existsSync("converted")) {
 
 const upload = multer({ dest: "uploads/" });
 
-// test route
 app.get("/", (req, res) => {
   res.send("PDF Converter API running");
 });
 
-// conversion route
 app.post("/convert", upload.single("file"), (req, res) => {
+
+  if (!req.file) {
+    return res.status(400).send("No file uploaded");
+  }
 
   const filePath = req.file.path;
   const outputPath = `converted/${req.file.filename}.pdf`;
@@ -49,6 +50,8 @@ app.post("/convert", upload.single("file"), (req, res) => {
 
 });
 
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
