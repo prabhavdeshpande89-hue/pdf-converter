@@ -5,7 +5,7 @@ export const convertFile = async (file) => {
   formData.append("file", file);
 
   const response = await axios.post(
-    "http://localhost:5000/convert",
+    "https://pdf-converter-iu50.onrender.com/convert",
     formData,
     { responseType: "blob" }
   );
