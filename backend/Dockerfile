@@ -1,6 +1,4 @@
 FROM node:18
-
-# install libreoffice
 RUN apt-get update && apt-get install -y libreoffice
 
 WORKDIR /app
