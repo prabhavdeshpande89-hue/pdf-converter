@@ -1,6 +1,27 @@
+const express = require("express");
+const multer = require("multer");
+const cors = require("cors");
+const fs = require("fs");
 const mammoth = require("mammoth");
 const PDFDocument = require("pdfkit");
 
+const app = express();   // ← THIS WAS MISSING
+
+app.use(cors());
+app.use(express.json());
+
+// Create folders if not present
+if (!fs.existsSync("uploads")) fs.mkdirSync("uploads");
+if (!fs.existsSync("converted")) fs.mkdirSync("converted");
+
+const upload = multer({ dest: "uploads/" });
+
+// Test route
+app.get("/", (req, res) => {
+  res.send("PDF Converter API running 🚀");
+});
+
+// Convert route
 app.post("/convert", upload.single("file"), async (req, res) => {
 
   if (!req.file) {
@@ -32,4 +53,11 @@ app.post("/convert", upload.single("file"), async (req, res) => {
     console.error(err);
     res.status(500).send("Conversion failed");
   }
+
+});
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
