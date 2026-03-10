@@ -5,23 +5,23 @@ const fs = require("fs");
 const mammoth = require("mammoth");
 const PDFDocument = require("pdfkit");
 
-const app = express();   // ← THIS WAS MISSING
+const app = express();   // IMPORTANT: app must be defined first
 
 app.use(cors());
 app.use(express.json());
 
-// Create folders if not present
+// create folders if missing
 if (!fs.existsSync("uploads")) fs.mkdirSync("uploads");
 if (!fs.existsSync("converted")) fs.mkdirSync("converted");
 
 const upload = multer({ dest: "uploads/" });
 
-// Test route
+// test route
 app.get("/", (req, res) => {
   res.send("PDF Converter API running 🚀");
 });
 
-// Convert route
+// convert route
 app.post("/convert", upload.single("file"), async (req, res) => {
 
   if (!req.file) {
