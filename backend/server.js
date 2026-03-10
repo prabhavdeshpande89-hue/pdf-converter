@@ -4,6 +4,9 @@ const cors = require("cors");
 const fs = require("fs");
 const libre = require("libreoffice-convert");
 
+// Fix for Render: set LibreOffice path
+process.env.LIBREOFFICE_PATH = "/usr/bin/soffice";
+
 const app = express();
 
 // Enable CORS for all devices
@@ -62,7 +65,6 @@ app.post("/convert", upload.single("file"), (req, res) => {
 
 });
 
-// Render uses dynamic port
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
