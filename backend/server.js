@@ -38,35 +38,55 @@ app.get("/", (req, res) => {
 // Convert route
 app.post("/convert", upload.single("file"), (req, res) => {
 
+  console.log("📥 Conversion request received");
+
   if (!req.file) {
+    console.log("❌ No file uploaded");
     return res.status(400).send("No file uploaded");
   }
 
   const filePath = req.file.path;
   const outputPath = `converted/${req.file.filename}.pdf`;
 
-  const file = fs.readFileSync(filePath);
+  console.log("📄 File uploaded:", filePath);
 
-  libre.convert(file, ".pdf", undefined, (err, done) => {
+  try {
+    const file = fs.readFileSync(filePath);
 
-    if (err) {
-      console.error(err);
-      return res.status(500).send("Conversion failed");
-    }
+    libre.convert(file, ".pdf", undefined, (err, done) => {
 
-    fs.writeFileSync(outputPath, done);
+      if (err) {
+        console.error("❌ Conversion error:", err);
+        return res.status(500).send("Conversion failed");
+      }
 
-    res.download(outputPath, () => {
-      fs.unlinkSync(filePath);
-      fs.unlinkSync(outputPath);
+      console.log("✅ Conversion successful");
+
+      fs.writeFileSync(outputPath, done);
+
+      res.download(outputPath, () => {
+        console.log("⬇️ File sent to user");
+
+        try {
+          fs.unlinkSync(filePath);
+          fs.unlinkSync(outputPath);
+          console.log("🧹 Temporary files deleted");
+        } catch (cleanupError) {
+          console.error("Cleanup error:", cleanupError);
+        }
+      });
+
     });
 
-  });
+  } catch (readError) {
+    console.error("❌ File read error:", readError);
+    return res.status(500).send("File processing failed");
+  }
 
 });
 
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
