@@ -32,17 +32,23 @@ app.post("/convert", upload.single("file"), async (req, res) => {
     const filePath = req.file.path;
     const pdfPath = `converted/${req.file.filename}.pdf`;
 
-    // extract text from DOCX
+    console.log("File uploaded:", filePath);
+
+    // Extract text from DOCX
     const result = await mammoth.extractRawText({ path: filePath });
+
+    console.log("Extracted text length:", result.value.length);
 
     const doc = new PDFDocument();
     const writeStream = fs.createWriteStream(pdfPath);
 
     doc.pipe(writeStream);
-    doc.fontSize(12).text(result.value);
+    doc.fontSize(12).text(result.value || "No text found in document");
     doc.end();
 
     writeStream.on("finish", () => {
+      console.log("PDF created successfully");
+
       res.download(pdfPath, "converted.pdf", () => {
         fs.unlinkSync(filePath);
         fs.unlinkSync(pdfPath);
@@ -50,12 +56,12 @@ app.post("/convert", upload.single("file"), async (req, res) => {
     });
 
     writeStream.on("error", (err) => {
-      console.error(err);
+      console.error("Stream error:", err);
       res.status(500).send("Conversion failed");
     });
 
   } catch (err) {
-    console.error(err);
+    console.error("Conversion error:", err);
     res.status(500).send("Conversion failed");
   }
 });
