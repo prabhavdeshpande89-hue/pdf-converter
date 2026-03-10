@@ -23,37 +23,41 @@ app.get("/", (req, res) => {
 
 // convert route
 app.post("/convert", upload.single("file"), async (req, res) => {
-
-  if (!req.file) {
-    return res.status(400).send("No file uploaded");
-  }
-
   try {
+
+    if (!req.file) {
+      return res.status(400).send("No file uploaded");
+    }
+
     const filePath = req.file.path;
-
-    const result = await mammoth.extractRawText({ path: filePath });
-
     const pdfPath = `converted/${req.file.filename}.pdf`;
 
-    const doc = new PDFDocument();
-    const stream = fs.createWriteStream(pdfPath);
+    // extract text from DOCX
+    const result = await mammoth.extractRawText({ path: filePath });
 
-    doc.pipe(stream);
-    doc.text(result.value);
+    const doc = new PDFDocument();
+    const writeStream = fs.createWriteStream(pdfPath);
+
+    doc.pipe(writeStream);
+    doc.fontSize(12).text(result.value);
     doc.end();
 
-    stream.on("finish", () => {
-      res.download(pdfPath, () => {
+    writeStream.on("finish", () => {
+      res.download(pdfPath, "converted.pdf", () => {
         fs.unlinkSync(filePath);
         fs.unlinkSync(pdfPath);
       });
+    });
+
+    writeStream.on("error", (err) => {
+      console.error(err);
+      res.status(500).send("Conversion failed");
     });
 
   } catch (err) {
     console.error(err);
     res.status(500).send("Conversion failed");
   }
-
 });
 
 const PORT = process.env.PORT || 5000;
